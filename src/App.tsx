@@ -52,7 +52,7 @@ function App() {
             onClick={handleInstall}
             className="bg-white text-blue-500 px-4 py-2 rounded font-bold hover:bg-gray-200 transition"
           >
-            Instalar App
+            Instalar Aplicacion
           </button>
         )}
       </div>
