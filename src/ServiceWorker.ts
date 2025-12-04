@@ -1,5 +1,4 @@
 export function registerSW(){
-    // implementar estrategia de cache (Cache First)
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/service-worker.js').then(registration => {

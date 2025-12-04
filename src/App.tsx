@@ -33,9 +33,9 @@ function App() {
     const choice = await deferredPrompt.userChoice;
 
     if (choice.outcome === "accepted") {
-      console.log("✅ Usuario aceptó instalar la app");
+      console.log("Usuario aceptó instalar la app");
     } else {
-      console.log("❌ Usuario rechazó instalar la app");
+      console.log("Usuario rechazó instalar la app");
     }
 
     setDeferredPrompt(null);
