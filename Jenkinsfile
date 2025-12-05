@@ -17,11 +17,10 @@ pipeline {
         sh 'npm install'
       }
     }
-
     stage('Build') {
       when {
         expression {
-          return env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'develop'
+          return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'develop'
         }
       }
       steps {
@@ -32,14 +31,14 @@ pipeline {
     stage('SonarQube') {
       when {
         expression {
-          return env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'develop'
+          return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'develop'
         }
       }
       steps {
         withSonarQubeEnv('SonarQube') {
           sh '''
             sonar-scanner \
-              -Dsonar.projectKey=clima-pwa \
+              -Dsonar.projectKey=am-majo \
               -Dsonar.sources=src \
               -Dsonar.host.url=http://sonarqube:9000 \
               -Dsonar.login=$SONAR_TOKEN
@@ -51,7 +50,7 @@ pipeline {
     stage('Deploy a Vercel (solo se hace push a main)') {
         when {
       expression {
-          return env.BRANCH_NAME == 'main'
+          return env.GIT_BRANCH == 'main'
         }
     }
       steps {
