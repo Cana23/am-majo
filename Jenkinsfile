@@ -1,64 +1,65 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    SONAR_TOKEN = credentials('sonar-token')
-    VERCEL_TOKEN = credentials('vercel-token')
-  }
-
-  stages {
-    stage("Instalar npm y nodejs") {
-        steps {
-        sh 'apt-get update && apt-get install -y nodejs npm'
-        }
-    }
-    stage('Instalar dependencias') {
-      steps {
-        sh 'npm install'
-      }
-    }
-    stage('Build') {
-      when {
-        expression {
-          return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'develop'
-        }
-      }
-      steps {
-        sh 'npm run build'
-      }
+    tools {
+        nodejs 'NodeJS' 
     }
 
-    stage('SonarQube') {
-      when {
-        expression {
-          return env.GIT_BRANCH == 'main' || env.GIT_BRANCH == 'develop'
-        }
-      }
-      steps {
-        withSonarQubeEnv('SonarQube') {
-          sh '''
-            sonar-scanner \
-              -Dsonar.projectKey=am-majo \
-              -Dsonar.sources=src \
-              -Dsonar.host.url=http://sonarqube:9000 \
-              -Dsonar.login=$SONAR_TOKEN
-          '''
-        }
-      }
-    }
+    environment {
+        VERCEL_TOKEN = credentials('vercel-token')
 
-    stage('Deploy a Vercel (solo se hace push a main)') {
-        when {
-      expression {
-          return env.GIT_BRANCH == 'main'
+    stages {
+        stage('Instalar dependencias') {
+            steps {
+                sh 'npm ci' 
+            }
+        }
+
+        stage('Tests Unitarios') {
+            steps {
+                sh 'npm run test'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                    npx sonar-scanner \
+                      -Dsonar.projectKey=poke-pwa \
+                      -Dsonar.sources=src \
+                      -Dsonar.host.url=http://sonarqube:9000 \
+                      -Dsonar.exclusions=**/*.test.jsx,**/*.spec.js,**/setupTests.js
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Deploy a Vercel') {
+            when {
+                expression { 
+                    return env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main' 
+                }
+            }
+            steps {
+                echo "🚀 Desplegando a Producción (Rama: ${env.GIT_BRANCH})"
+                sh 'npx vercel deploy --prod --token=$VERCEL_TOKEN --yes'
+            }
         }
     }
-      steps {
-        sh '''
-          npm install -g vercel
-          vercel --prod --yes --token=$VERCEL_TOKEN
-        '''
-      }
-    }
-  }
+}
 }
