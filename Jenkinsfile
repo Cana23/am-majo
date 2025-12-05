@@ -1,18 +1,19 @@
 pipeline {
     agent any
 
-
     environment {
-        SONAR_TOKEN = credentials('sonar-token')
+        SONAR_TOKEN = credentials('sonar-token') 
         VERCEL_TOKEN = credentials('vercel-token')
+    }
 
     stages {
 
         stage("Instalar npm y nodejs") {
-        steps {
-        sh 'apt-get update && apt-get install -y nodejs npm'
+            steps {
+                sh 'apt-get update && apt-get install -y nodejs npm'
+            }
         }
-    }
+        
         stage('Instalar dependencias') {
             steps {
                 sh 'npm install' 
@@ -35,10 +36,10 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
-                    npx sonar-scanner \
-                      -Dsonar.projectKey=poke-pwa \
-                      -Dsonar.sources=src \
-                      -Dsonar.host.url=http://sonarqube:9000 \
+                    npx sonar-scanner \\
+                      -Dsonar.projectKey=poke-pwa \\
+                      -Dsonar.sources=src \\
+                      -Dsonar.host.url=http://sonarqube:9000 \\
                       -Dsonar.exclusions=**/*.test.jsx,**/*.spec.js,**/setupTests.js
                     '''
                 }
@@ -65,5 +66,4 @@ pipeline {
             }
         }
     }
-}
 }
