@@ -1,17 +1,21 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'NodeJS' 
-    }
 
     environment {
+        SONAR_TOKEN = credentials('sonar-token')
         VERCEL_TOKEN = credentials('vercel-token')
 
     stages {
+
+        stage("Instalar npm y nodejs") {
+        steps {
+        sh 'apt-get update && apt-get install -y nodejs npm'
+        }
+    }
         stage('Instalar dependencias') {
             steps {
-                sh 'npm ci' 
+                sh 'npm install' 
             }
         }
 
