@@ -20,9 +20,8 @@ pipeline {
 
     stage('Build') {
       when {
-        anyOf {
-          branch 'main'
-          branch 'develop'
+        expression {
+          return env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'develop'
         }
       }
       steps {
@@ -32,9 +31,8 @@ pipeline {
 
     stage('SonarQube') {
       when {
-        anyOf {
-          branch 'main'
-          branch 'develop'
+        expression {
+          return env.BRANCH_NAME == 'main' || env.BRANCH_NAME == 'develop'
         }
       }
       steps {
@@ -51,9 +49,11 @@ pipeline {
     }
 
     stage('Deploy a Vercel (solo se hace push a main)') {
-      when {
-        branch 'main'
-      }
+        when {
+      expression {
+          return env.BRANCH_NAME == 'main'
+        }
+    }
       steps {
         sh '''
           npm install -g vercel
