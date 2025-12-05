@@ -31,7 +31,7 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     sh '''
                     npx sonar-scanner \\
-                      -Dsonar.projectKey=poke-pwa \\
+                      -Dsonar.projectKey=am-majo \\
                       -Dsonar.sources=src \\
                       -Dsonar.host.url=http://sonarqube:9000 \\
                       -Dsonar.exclusions=**/*.test.jsx,**/*.spec.js,**/setupTests.js

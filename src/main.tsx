@@ -1,7 +1,10 @@
 import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
-import { registerSW } from './ServiceWorker';
+import { StrictMode } from 'react';
 
-createRoot(document.getElementById('root')!).render(<App />);
-registerSW();
+createRoot(document.getElementById('root') as HTMLElement).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
